@@ -31,8 +31,21 @@ var admin = new Router('/admin');
 
 admin.route('/test').get(function*() { return this.body = 'admin!' });
 
-app.use(router.middleware());
+let another = new Router;
 
+another
+.pre('post', bodyParser())
+.route('/magic', {
+  get: function*(next) {
+    return this.body = 'maaaagic!';
+  },
+  post: function*(next) {
+
+  }
+});
+
+app.use(router.middleware());
 app.use(admin.middleware());
+app.use(another.middleware());
 
 app.listen(3010);
