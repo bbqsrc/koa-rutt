@@ -47,6 +47,31 @@ describe('Router', function() {
       expect(router.preMiddleware[method]).toBeDefined();
     }
   });
+
+  it('allows each HTTP method', function() {
+    let router = new Router;
+
+    // Create initial route.
+    router.route('/test');
+
+    for (let method of ['get', 'post', 'delete', 'put']) {
+      expect(router.routes['/test'].middleware[method]).not.toBeDefined();
+      router[method]('/test', function*() {});
+      expect(router.routes['/test'].middleware[method]).toBeDefined();
+    }
+  });
+});
+
+describe('Route', function() {
+  it('allows each HTTP method', function() {
+    let route = new Route(new Router, '/test');
+
+    for (let method of ['get', 'post', 'delete', 'put']) {
+      expect(route.middleware[method]).not.toBeDefined();
+      route[method](function*() {});
+      expect(route.middleware[method]).toBeDefined();
+    }
+  });
 });
 
 describe('Router in an app', function() {
