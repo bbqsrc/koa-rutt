@@ -82,7 +82,8 @@ describe('Router in an app', function() {
 
     router = new Router;
 
-    router.route('/test', {
+    router
+    .route('/test', {
       get: function*() {
         this.body = 'get!';
       },
@@ -95,6 +96,9 @@ describe('Router in an app', function() {
       delete: function*() {
         this.body = 'delete!';
       }
+    })
+    .get('/params/:test1/:test2', function*() {
+      this.body = this.params.test1 + ',' + this.params.test2;
     });
 
     app.use(router.middleware());
@@ -131,6 +135,14 @@ describe('Router in an app', function() {
     .delete('/test')
     .expect(200)
     .expect('delete!')
+    .exec(done);
+  });
+
+  it('handles .params properly', function(done) {
+    request
+    .get('/params/foo/magic')
+    .expect(200)
+    .expect('foo,magic')
     .exec(done);
   });
 });
