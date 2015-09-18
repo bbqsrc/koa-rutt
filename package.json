@@ -1,7 +1,7 @@
 {
   "name": "koa-rutt",
   "version": "0.0.1",
-  "description": "Another koa routing library",
+  "description": "Another Koa routing library",
   "main": "index.js",
   "dependencies": {
     "koa-compose": "^2.3.0",
@@ -9,10 +9,12 @@
   },
   "devDependencies": {
     "eslint": "^1.4.3",
-    "koa": "^1.0.0"
+    "jasmine": "^2.3.2",
+    "koa": "^1.0.0",
+    "supertest": "^1.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jasmine"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
   "license": "ISC"
