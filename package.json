@@ -8,13 +8,15 @@
     "path-to-regexp": "^1.2.1"
   },
   "devDependencies": {
+    "codecov.io": "^0.1.6",
     "eslint": "^1.4.3",
     "jasmine": "^2.3.2",
     "koa": "^1.0.0",
     "supertest": "^1.1.0"
   },
   "scripts": {
-    "test": "jasmine"
+    "test": "jasmine",
+    "coverage": "istanbul cover jasmine && cat ./coverage/coverage.json | codecov"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
   "license": "ISC"
