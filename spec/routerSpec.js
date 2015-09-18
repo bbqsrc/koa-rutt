@@ -75,12 +75,13 @@ describe('Route', function() {
 });
 
 describe('Router in an app', function() {
-  var app, request, router;
+  var app, request, router, router2;
 
   beforeAll(function() {
     app = koa();
 
     router = new Router;
+    router2 = new Router;
 
     router
     .route('/test', {
@@ -101,7 +102,18 @@ describe('Router in an app', function() {
       this.body = this.params.test1 + ',' + this.params.test2;
     });
 
+    router2
+    .pre(function*(next) {
+      this.body = 'pre';
+
+      yield next;
+    })
+    .get('/pre', function*() {
+      this.body += 'get';
+    });
+
     app.use(router.middleware());
+    app.use(router2.middleware());
 
     request = supertest.agent(app.listen());
   });
@@ -143,6 +155,14 @@ describe('Router in an app', function() {
     .get('/params/foo/magic')
     .expect(200)
     .expect('foo,magic')
+    .exec(done);
+  });
+
+  it('resolves #pre middleware properly', function(done) {
+    request
+    .get('/pre')
+    .expect(200)
+    .expect('preget')
     .exec(done);
   });
 });
