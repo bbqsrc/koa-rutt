@@ -1,6 +1,6 @@
 {
   "name": "koa-rutt",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Another Koa routing library",
   "main": "index.js",
   "dependencies": {

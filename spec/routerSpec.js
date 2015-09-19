@@ -165,4 +165,8 @@ describe('Router in an app', function() {
     .expect('preget')
     .exec(done);
   });
+
+  it('returns 404 for unrouted pages', function(done) {
+    request.get('/anything').expect(404).exec(done);
+  })
 });
