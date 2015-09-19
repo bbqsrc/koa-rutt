@@ -1,0 +1,7 @@
+coverage/
+scripts/
+out/
+test.js
+.eslintrc
+.travis.yml
+.npmignore

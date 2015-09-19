@@ -20,5 +20,12 @@
     "coverage": "istanbul cover jasmine && cat ./coverage/coverage.json | codecov"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
-  "license": "ISC"
+  "license": "ISC",
+  "keywords": ["koa", "koajs", "router", "routing", "rutt"],
+  "bugs": "https://github.com/bbqsrc/koa-rutt/issues",
+  "repository": "bbqsrc/koa-rutt",
+  "engines": {
+    "node": ">=4.0.0",
+    "iojs": ">=2.0.0"
+  }
 }
