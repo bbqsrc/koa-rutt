@@ -25,7 +25,8 @@
   },
   "scripts": {
     "test": "mocha",
-    "coverage": "istanbul cover mocha --report lcovonly && cat ./coverage/coverage.json | codecov"
+    "coverage": "istanbul cover mocha --report lcovonly && cat ./coverage/coverage.json | codecov",
+    "doc": "node scripts/gendox.js > doc.md"
   },
   "author": "Brendan Molloy <brendan@bbqsrc.net>",
   "license": "BSD-2-Clause",
