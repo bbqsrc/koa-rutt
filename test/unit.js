@@ -61,16 +61,16 @@ describe("Router", function() {
 
     router
       .route("/test", {
-        get: function* () {
+        * get() {
           this.body = "get!"
         },
-        post: function* () {
+        * post() {
           this.body = "post!"
         },
-        put: function* () {
+        * put() {
           this.body = "put!"
         },
-        delete: function* () {
+        * delete() {
           this.body = "delete!"
         }
       })
@@ -78,7 +78,7 @@ describe("Router", function() {
         this.body = `${this.params.test1},${this.params.test2}`
       })
       .route("/longer/url/here", {
-        get: function* () {
+        * get() {
           this.body = "yus"
         }
       })
