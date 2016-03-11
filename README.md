@@ -172,7 +172,7 @@ provided, the middleware will run before all other middlewares on the router.
 
 | Name | Type | Attributes | Description |
 | ---- | ---- | ---------- | ----------- |
-| [method] | `string` | optional | The HTTP method (eg 'get') to as pre-middleware to. |
+| [method] | `string` | optional | The HTTP method (eg 'get') to add pre-middleware to. |
 | middleware | `GeneratorFunction` | multiple | The middleware to attach. |
 
 **Returns:** `Router` Returns this instance of Router.
