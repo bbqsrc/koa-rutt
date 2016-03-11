@@ -82,8 +82,11 @@ describe("Router", function() {
           this.body = "yus"
         }
       })
-      .get("/yield*", function* (next) {
-        return yield next
+      .get("/yield-before", function* () {
+        this.body = "before yield"
+      })
+      .get("/yield*", function* () {
+        this.body = ":)"
       })
       .get("/yield-after", function* () {
         this.body = "after yield"
@@ -158,15 +161,21 @@ describe("Router", function() {
         .expect("yus")
     })
 
-    it.skip("passes to the next route on yield next", function* () {
+    it("always returns the first match", function* () {
+      yield request
+        .get("/yield-before")
+        .expect(200)
+        .expect("before yield")
+
       yield request
         .get("/yield123")
         .expect(200)
+        .expect(":)")
 
       yield request
         .get("/yield-after")
         .expect(200)
-        .expect("after yield")
+        .expect(":)")
     })
   })
 })
