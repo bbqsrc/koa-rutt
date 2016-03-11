@@ -5,3 +5,4 @@ test.js
 .eslintrc
 .travis.yml
 .npmignore
+.envrc
