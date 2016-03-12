@@ -18,7 +18,7 @@ function getSource() {
     out.push(convertToMarkdown(data))
   }
 
-  console.log("## API\n\n" + toc.join("\n") + "\n\n" + out.join("\n\n---\n\n"))
+  console.log("## API\n\n" + toc.join("\n") + out.join("\n\n---\n\n"))
 }
 
 function parseTags(segment) {
@@ -38,11 +38,12 @@ function parseTags(segment) {
       const re = /<caption>(.*?)<\/caption>\s*/
 
       if (re.test(tag.string)) {
-        tag.string = tag.string.replace(re, () => {
-          tag.caption = arguments[1]
+        tag.string = tag.string.replace(re, (_, cap) => {
+          tag.caption = cap
           return ""
         })
       }
+
       o.example.push(tag)
     } else {
       o[tag.type] = tag
@@ -61,11 +62,11 @@ function convertToMarkdown(data) {
   const x = []
 
   for (const segment of o) {
-    const out = []
-
-    if (segment.isPrivate) {
+    if (segment.isPrivate || segment.tags.length === 0) {
       continue
     }
+
+    const out = []
 
     const tags = parseTags(segment)
     const name = tags.name ? tags.name.string : segment.ctx.name
@@ -95,11 +96,20 @@ function convertToMarkdown(data) {
           attrs.push("optional")
         }
 
-        outNameParams.push((param.variable ? "..." : "") + param.name)
+        let desc = param.description.trim()
+
+        if (desc.startsWith("-")) {
+          desc = desc.substring(1).trim()
+        }
+
+        if (param.name.indexOf(".") === -1) {
+          outNameParams.push((param.variable ? "..." : "") + param.name)
+        }
+
         outParams.push("| " + param.name +
                 " | `" + param.types.join("|") +
                 "` | " + attrs.join(",") +
-                " | " + param.description + " |")
+                " | " + desc + " |")
       }
     }
 
@@ -128,7 +138,7 @@ function convertToMarkdown(data) {
 
     if (tags.returns) {
       out.push("**Returns:** `" + tags.returns.types.join("|") + "` " +
-              tags.returns.description)
+              tags.returns.description.replace(/\s+/g, " "))
     }
 
     if (tags.example) {

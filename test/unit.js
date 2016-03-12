@@ -2,6 +2,7 @@
 
 const Router = require("../lib/router")
 const Route = require("../lib/route")
+const constants = require('../lib/constants')
 
 const koa = require("koa")
 const supertest = require("supertest-as-promised")
@@ -32,7 +33,7 @@ describe("Router", function() {
   it("allows #pre setting for each HTTP method", function() {
     const router = new Router()
 
-    for (const method of ["get", "post", "delete", "put"]) {
+    for (const method of constants.methods) {
       expect(router.preMiddleware[method]).not.to.exist
       router.pre(method, function* () {})
       expect(router.preMiddleware[method]).to.exist
@@ -45,7 +46,7 @@ describe("Router", function() {
     // Create initial route.
     router.route("/test")
 
-    for (const method of ["get", "post", "delete", "put"]) {
+    for (const method of constants.methods) {
       expect(router.routes["/test"].middleware[method]).not.to.exist
 
       router[method]("/test", function* () {})
@@ -58,6 +59,7 @@ describe("Router", function() {
 
     const router = new Router()
     const router2 = new Router()
+    const router3 = new Router({ prefix: "/prefix" })
 
     router
       .route("/test", {
@@ -101,8 +103,14 @@ describe("Router", function() {
         this.body += "get"
       })
 
+    router3
+      .get("/foo", function* (next) {
+        this.body = "yes"
+      })
+
     app.use(router.middleware())
     app.use(router2.middleware())
+    app.use(router3.middleware())
 
     const request = supertest.agent(app.listen())
 
@@ -177,6 +185,13 @@ describe("Router", function() {
         .expect(200)
         .expect(":)")
     })
+
+    it("handles prefixed routers", function* () {
+      yield request
+        .get("/prefix/foo")
+        .expect(200)
+        .expect("yes")
+    })
   })
 })
 
@@ -184,7 +199,7 @@ describe("Route", function() {
   it("allows each HTTP method", function() {
     const route = new Route(new Router(), "/test")
 
-    for (const method of ["get", "post", "delete", "put"]) {
+    for (const method of constants.methods) {
       expect(route.middleware[method]).not.to.exist
 
       route[method](function* () {})

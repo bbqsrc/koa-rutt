@@ -75,7 +75,7 @@ app.listen(3000);
   - [`new Route (router, path)`](#new-route-router-path)
   - [`Route#get|post|delete|put (...middleware) → {Route}`](#routegetpostdeleteput-middleware--route)
 - [class `Router`](#class-router)
-  - [`new Router (prefix)`](#new-router-prefix)
+  - [`new Router ([options])`](#new-router-options)
   - [`Router#get|post|delete|put (path, ...middleware) → {Router}`](#routergetpostdeleteput-path-middleware--router)
   - [`Router#route (path, [methods]) → {Router|Route}`](#routerroute-path-methods--routerroute)
   - [`Router#pre ([method], ...middleware) → {Router}`](#routerpre-method-middleware--router)
@@ -114,13 +114,14 @@ Assign middleware to be run upon relevant HTTP method being triggered.
 
 ---
 
-#### `new Router (prefix)`
+#### `new Router ([options])`
 
 The router.
 
 | Name | Type | Attributes | Description |
 | ---- | ---- | ---------- | ----------- |
-| prefix | `String` |  | The prefix of each route of this router. |
+| [options] | `Object` | optional | Options object |
+| options.prefix | `string` |  | The prefix of each route of this router. |
 
 ---
 
@@ -147,20 +148,25 @@ by using the optional methods parameter.
 | path | `String` |  | The URL path to the resource. |
 | [methods] | `Object` | optional | An object with HTTP methods. |
 
-**Returns:** `Router|Route` Returns this instance of Router, or Route for path                         if no methods specified.
+**Returns:** `Router|Route` Returns this instance of Router, or Route for path if no methods specified.
 
 **Example:** Usage with optional methods parameter
 
 ```javascript
 router.route('/test', {
-  get: function* (next) { ... }
-});
+  * get(next) {
+    // Do something
+  },
+  * post(next) {
+    // Do something
+  }
+})
 ```
 
 **Example:** Usage with only path parameter
 
 ```javascript
-let testRoute = router.route('/test');
+const testRoute = router.route('/test')
 ```
 
 ---
@@ -181,9 +187,9 @@ provided, the middleware will run before all other middlewares on the router.
 
 ```javascript
 router.pre(function* (next) {
-  this.type = 'application/json';
-  yield next;
-}).pre('post', bodyParser());
+  this.type = 'application/json'
+  yield next
+}).pre('post', bodyParser())
 ```
 
 ---
@@ -196,4 +202,4 @@ Returns the middleware to be provided to the Koa app instance.
 
 ## License
 
-ISC - see LICENSE.
+BSD 2-clause license. See LICENSE.
