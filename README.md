@@ -175,23 +175,20 @@ All class methods are bound to the class instance.
 ```javascript
 class MemberRoutes extends Routes {
  [endpoints]() {
-   const get = {
-     "/member/:id": this.get
+   return {
+     get: {
+       "/member/:id": this.get
+     },
+     post: {
+       "/members": this.create
+     },
+     put: {
+       "/member/:id": [requireAuth, this.update]
+     },
+     delete: {
+       "/member/:id": [requireAuth, this.delete]
+     }
    }
-
-   const post = {
-     "/members": this.create
-   }
-
-   const put = {
-     "/member/:id": [requireAuth, this.update]
-   }
-
-   const del = {
-     "/member/:id": [requireAuth, this.delete]
-   }
-
-   return { get, post, put, delete: del }
  }
 
  * get(ctx, next) { ... }
