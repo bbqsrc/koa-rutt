@@ -2,7 +2,7 @@
 
 const Router = require("../lib/router")
 const Route = require("../lib/route")
-const constants = require('../lib/constants')
+const constants = require("../lib/constants")
 
 const koa = require("koa")
 const supertest = require("supertest-as-promised")
@@ -63,49 +63,49 @@ describe("Router", function() {
 
     router
       .route("/test", {
-        * get() {
-          this.body = "get!"
+        * get(ctx) {
+          ctx.body = "get!"
         },
-        * post() {
-          this.body = "post!"
+        * post(ctx) {
+          ctx.body = "post!"
         },
-        * put() {
-          this.body = "put!"
+        * put(ctx) {
+          ctx.body = "put!"
         },
-        * delete() {
-          this.body = "delete!"
+        * delete(ctx) {
+          ctx.body = "delete!"
         }
       })
-      .get("/params/:test1/:test2", function* () {
-        this.body = `${this.params.test1},${this.params.test2}`
+      .get("/params/:test1/:test2", function* (ctx) {
+        ctx.body = `${ctx.params.test1},${ctx.params.test2}`
       })
       .route("/longer/url/here", {
-        * get() {
-          this.body = "yus"
+        * get(ctx) {
+          ctx.body = "yus"
         }
       })
-      .get("/yield-before", function* () {
-        this.body = "before yield"
+      .get("/yield-before", function* (ctx) {
+        ctx.body = "before yield"
       })
-      .get("/yield*", function* () {
-        this.body = ":)"
+      .get("/yield*", function* (ctx) {
+        ctx.body = ":)"
       })
-      .get("/yield-after", function* () {
-        this.body = "after yield"
+      .get("/yield-after", function* (ctx) {
+        ctx.body = "after yield"
       })
 
     router2
-      .pre(function* (next) {
-        this.body = "pre"
+      .pre(function* (ctx, next) {
+        ctx.body = "pre"
         yield next
       })
-      .get("/pre", function* () {
-        this.body += "get"
+      .get("/pre", function* (ctx) {
+        ctx.body += "get"
       })
 
     router3
-      .get("/foo", function* (next) {
-        this.body = "yes"
+      .get("/foo", function* (ctx) {
+        ctx.body = "yes"
       })
 
     app.use(router.middleware())
@@ -192,6 +192,80 @@ describe("Router", function() {
         .expect(200)
         .expect("yes")
     })
+  })
+})
+
+describe("Endpoints protocol", function() {
+  const endpoints = require("../lib/constants").endpoints
+
+  function* requireAuth(ctx, next) {
+    // stub
+    yield next
+  }
+
+  class TestRoutes {
+    [endpoints]() {
+      return {
+        get: {
+          "/test/:id": this.get
+        },
+        post: {
+          "/tests": this.create
+        },
+        put: {
+          "/test/:id": [requireAuth, this.update]
+        },
+        delete: {
+          "/test/:id": [requireAuth, this.delete]
+        }
+      }
+    }
+
+    * get(ctx) {
+      ctx.body = ctx.params.id
+    }
+
+    * create(ctx) {
+      ctx.body = "create"
+    }
+
+    * update(ctx) {
+      ctx.body = "update"
+    }
+
+    * delete(ctx) {
+      ctx.body = "delete"
+    }
+  }
+
+  const app = koa()
+  const router = new Router()
+
+  router.use(TestRoutes)
+  app.use(router.middleware())
+
+  const request = supertest.agent(app.listen())
+
+  it("works as expected", function* () {
+    yield request
+      .get("/test/123")
+      .expect(200)
+      .expect("123")
+
+    yield request
+      .post("/tests")
+      .expect(200)
+      .expect("create")
+
+    yield request
+      .put("/test/123")
+      .expect(200)
+      .expect("update")
+
+    yield request
+      .delete("/test/123")
+      .expect(200)
+      .expect("delete")
   })
 })
 

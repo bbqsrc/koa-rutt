@@ -71,15 +71,35 @@ app.listen(3000);
 
 ## API
 
+- [callback `Middleware`](#callback-middleware)
+  - [`function* Middleware(ctx, next)`](#function-middlewarectx-next)
 - [class `Route`](#class-route)
-  - [`new Route (router, path)`](#new-route-router-path)
-  - [`Route#get|post|delete|put (...middleware) → {Route}`](#routegetpostdeleteput-middleware--route)
+  - [`new Route(router, path)`](#new-routerouter-path)
+  - [`Route#for(...middleware) → {Route}`](#routeformiddleware--route)
 - [class `Router`](#class-router)
-  - [`new Router ([options])`](#new-router-options)
-  - [`Router#get|post|delete|put (path, ...middleware) → {Router}`](#routergetpostdeleteput-path-middleware--router)
-  - [`Router#route (path, [methods]) → {Router|Route}`](#routerroute-path-methods--routerroute)
-  - [`Router#pre ([method], ...middleware) → {Router}`](#routerpre-method-middleware--router)
-  - [`Router#middleware () → {GeneratorFunction}`](#routermiddleware---generatorfunction)
+  - [`new Router([options])`](#new-routeroptions)
+  - [`Router#for(path, ...middleware) → {Router}`](#routerforpath-middleware--router)
+  - [`Router#use(routeClass) → {Router}`](#routeruserouteclass--router)
+  - [`Router#route(path, [methods]) → {Router|Route}`](#routerroutepath-methods--routerroute)
+  - [`Router#pre([method], ...middleware) → {Router}`](#routerpremethod-middleware--router)
+  - [`Router#middleware() → {GeneratorFunction}`](#routermiddleware--generatorfunction)
+
+---
+
+### callback `Middleware`
+
+---
+
+#### `function* Middleware(ctx, next)`
+
+Middleware callback signature for use with koa-rutt.
+
+Must be a generator.
+
+| Name | Type | Attributes | Description |
+| ---- | ---- | ---------- | ----------- |
+| ctx | `KoaContext` |  | The koa context. |
+| next | `KoaMiddleware` |  | The koa 'next' middleware. |
 
 ---
 
@@ -87,7 +107,7 @@ app.listen(3000);
 
 ---
 
-#### `new Route (router, path)`
+#### `new Route(router, path)`
 
 The route.
 
@@ -98,13 +118,13 @@ The route.
 
 ---
 
-#### `Route#get|post|delete|put (...middleware) → {Route}`
+#### `Route#for(...middleware) → {Route}`
 
 Assign middleware to be run upon relevant HTTP method being triggered.
 
 | Name | Type | Attributes | Description |
 | ---- | ---- | ---------- | ----------- |
-| middleware | `GeneratorFunction` | multiple | Middleware to be attached to called HTTP method. |
+| middleware | `Middleware` | multiple | Middleware to be attached to called HTTP method. |
 
 **Returns:** `Route` Returns this instance of Route.
 
@@ -114,7 +134,7 @@ Assign middleware to be run upon relevant HTTP method being triggered.
 
 ---
 
-#### `new Router ([options])`
+#### `new Router([options])`
 
 The router.
 
@@ -125,20 +145,65 @@ The router.
 
 ---
 
-#### `Router#get|post|delete|put (path, ...middleware) → {Router}`
+#### `Router#for(path, ...middleware) → {Router}`
 
 Assign middleware to be run upon relevant HTTP method being triggered.
 
 | Name | Type | Attributes | Description |
 | ---- | ---- | ---------- | ----------- |
 | path | `String` |  | The path to the relevant Route. |
-| middleware | `GeneratorFunction` | multiple | Middleware to be attached to called HTTP method. |
+| middleware | `Middleware` | multiple | Middleware to be attached to called HTTP method. |
 
 **Returns:** `Router` Returns this instance of Router.
 
 ---
 
-#### `Router#route (path, [methods]) → {Router|Route}`
+#### `Router#use(routeClass) → {Router}`
+
+Add routes using a provided constructor that implements the endpoints protocol.
+
+All class methods are bound to the class instance.
+
+| Name | Type | Attributes | Description |
+| ---- | ---- | ---------- | ----------- |
+| routeClass | `Function|Class` |  | The constructor implementing endpoints protocol |
+
+**Returns:** `Router` Returns this instance of Router.
+
+**Example:** Usage with class
+
+```javascript
+class MemberRoutes extends Routes {
+ [endpoints]() {
+   const get = {
+     "/member/:id": this.get
+   }
+
+   const post = {
+     "/members": this.create
+   }
+
+   const put = {
+     "/member/:id": [requireAuth, this.update]
+   }
+
+   const del = {
+     "/member/:id": [requireAuth, this.delete]
+   }
+
+   return { get, post, put, delete: del }
+ }
+
+ * get(ctx, next) { ... }
+ * create(ctx, next) { ... }
+ * update(ctx, next) { ... }
+ * delete(ctx, next) { ... }
+}
+```
+
+---
+
+#### `Router#route(path, [methods]) → {Router|Route}`
 
 Create or get a Route from the Router object, or HTTP methods on Route
 by using the optional methods parameter.
@@ -154,10 +219,10 @@ by using the optional methods parameter.
 
 ```javascript
 router.route('/test', {
-  * get(next) {
+  * get(ctx, next) {
     // Do something
   },
-  * post(next) {
+  * post(ctx, next) {
     // Do something
   }
 })
@@ -171,7 +236,7 @@ const testRoute = router.route('/test')
 
 ---
 
-#### `Router#pre ([method], ...middleware) → {Router}`
+#### `Router#pre([method], ...middleware) → {Router}`
 
 Define middleware to run prior to HTTP method middleware. If no method
 provided, the middleware will run before all other middlewares on the router.
@@ -179,22 +244,22 @@ provided, the middleware will run before all other middlewares on the router.
 | Name | Type | Attributes | Description |
 | ---- | ---- | ---------- | ----------- |
 | [method] | `string` | optional | The HTTP method (eg 'get') to add pre-middleware to. |
-| middleware | `GeneratorFunction` | multiple | The middleware to attach. |
+| middleware | `Middleware` | multiple | The middleware to attach. |
 
 **Returns:** `Router` Returns this instance of Router.
 
 **Example:** Example of #pre usage.
 
 ```javascript
-router.pre(function* (next) {
-  this.type = 'application/json'
+router.pre(function* (ctx, next) {
+  ctx.type = 'application/json'
   yield next
 }).pre('post', bodyParser())
 ```
 
 ---
 
-#### `Router#middleware () → {GeneratorFunction}`
+#### `Router#middleware() → {GeneratorFunction}`
 
 Returns the middleware to be provided to the Koa app instance.
 

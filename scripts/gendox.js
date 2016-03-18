@@ -18,7 +18,7 @@ function getSource() {
     out.push(convertToMarkdown(data))
   }
 
-  console.log("## API\n\n" + toc.join("\n") + out.join("\n\n---\n\n"))
+  console.log("## API\n\n" + toc.join("\n") + "\n\n---\n\n" + out.join("\n\n---\n\n"))
 }
 
 function parseTags(segment) {
@@ -69,7 +69,18 @@ function convertToMarkdown(data) {
     const out = []
 
     const tags = parseTags(segment)
-    const name = tags.name ? tags.name.string : segment.ctx.name
+
+    let name
+
+    if (tags.callback) {
+      name = tags.callback.string
+    } else if (tags.class) {
+      name = tags.class.string
+    } else if (segment) {
+      name = segment.ctx.name
+    } else {
+      throw new TypeError(`Unknown tags: ${JSON.stringify(tags, null, 2)}`)
+    }
 
     let outName
     const outNameParams = []
@@ -77,6 +88,11 @@ function convertToMarkdown(data) {
 
     if (segment.isClass) {
       const n = "class `" + name + "`"
+
+      x.push("### " + n)
+      toc.push("- [" + n + "](#" + mdTitleURL(n) + ")")
+    } else if (tags.callback) {
+      const n = "callback `" + name + "`"
 
       x.push("### " + n)
       toc.push("- [" + n + "](#" + mdTitleURL(n) + ")")
@@ -118,12 +134,14 @@ function convertToMarkdown(data) {
     } else {
       outName = "`"
 
-      if (segment.ctx.type === "method") {
+      if (segment.ctx && segment.ctx.type === "method") {
         outName += segment.ctx.cons + "#" + name
+      } else if (tags.callback) {
+        outName += "function* " + name
       }
     }
 
-    outName += " (" + outNameParams.join(", ") + ")"
+    outName += "(" + outNameParams.join(", ") + ")"
 
     if (tags.returns) {
       outName += " → {" + tags.returns.types.join("|") + "}"

@@ -1,6 +1,7 @@
 coverage/
 scripts/
 out/
+test/
 test.js
 .eslintrc
 .travis.yml
