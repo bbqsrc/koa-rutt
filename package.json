@@ -1,10 +1,9 @@
 {
   "name": "koa-rutt",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Another Koa routing library",
   "main": "index.js",
   "dependencies": {
-    "koa-compose": "^2.4.0",
     "path-to-regexp": "^1.2.1"
   },
   "devDependencies": {
