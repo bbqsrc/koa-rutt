@@ -76,6 +76,8 @@ function convertToMarkdown(data) {
       name = tags.callback.string
     } else if (tags.class) {
       name = tags.class.string
+    } else if (tags.name) {
+      name = tags.name.string
     } else if (segment) {
       name = segment.ctx.name
     } else {

@@ -75,10 +75,10 @@ app.listen(3000);
   - [`function* Middleware(ctx, next)`](#function-middlewarectx-next)
 - [class `Route`](#class-route)
   - [`new Route(router, path)`](#new-routerouter-path)
-  - [`Route#for(...middleware) → {Route}`](#routeformiddleware--route)
+  - [`Route#get|post|delete|put(...middleware) → {Route}`](#routegetpostdeleteputmiddleware--route)
 - [class `Router`](#class-router)
   - [`new Router([options])`](#new-routeroptions)
-  - [`Router#for(path, ...middleware) → {Router}`](#routerforpath-middleware--router)
+  - [`Router#get|post|delete|put(path, ...middleware) → {Router}`](#routergetpostdeleteputpath-middleware--router)
   - [`Router#use(routeClass) → {Router}`](#routeruserouteclass--router)
   - [`Router#route(path, [methods]) → {Router|Route}`](#routerroutepath-methods--routerroute)
   - [`Router#pre([method], ...middleware) → {Router}`](#routerpremethod-middleware--router)
@@ -118,7 +118,7 @@ The route.
 
 ---
 
-#### `Route#for(...middleware) → {Route}`
+#### `Route#get|post|delete|put(...middleware) → {Route}`
 
 Assign middleware to be run upon relevant HTTP method being triggered.
 
@@ -145,7 +145,7 @@ The router.
 
 ---
 
-#### `Router#for(path, ...middleware) → {Router}`
+#### `Router#get|post|delete|put(path, ...middleware) → {Router}`
 
 Assign middleware to be run upon relevant HTTP method being triggered.
 
@@ -170,31 +170,33 @@ All class methods are bound to the class instance.
 
 **Returns:** `Router` Returns this instance of Router.
 
-**Example:** Usage with class
+**Example:** Usage with class implementing endpoints protocol
 
 ```javascript
-class MemberRoutes extends Routes {
- [endpoints]() {
-   return {
-     get: {
-       "/member/:id": this.get
-     },
-     post: {
-       "/members": this.create
-     },
-     put: {
-       "/member/:id": [requireAuth, this.update]
-     },
-     delete: {
-       "/member/:id": [requireAuth, this.delete]
-     }
-   }
- }
+const endpoints = require("koa-rutt").endpoints
 
- * get(ctx, next) { ... }
- * create(ctx, next) { ... }
- * update(ctx, next) { ... }
- * delete(ctx, next) { ... }
+class MemberRoutes {
+  [endpoints]() {
+    return {
+      get: {
+        "/member/:id": this.get
+      },
+      post: {
+        "/members": this.create
+      },
+      put: {
+        "/member/:id": [requireAuth, this.update]
+      },
+      delete: {
+        "/member/:id": [requireAuth, this.delete]
+      }
+    }
+  }
+
+  * get(ctx, next) { ... }
+  * create(ctx, next) { ... }
+  * update(ctx, next) { ... }
+  * delete(ctx, next) { ... }
 }
 ```
 
