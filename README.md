@@ -81,6 +81,7 @@ app.listen(3000);
   - [`Router#get|post|delete|put(path, ...middleware) → {Router}`](#routergetpostdeleteputpath-middleware--router)
   - [`Router#use(routeClass) → {Router}`](#routeruserouteclass--router)
   - [`Router#route(path, [methods]) → {Router|Route}`](#routerroutepath-methods--routerroute)
+  - [`Router#assets(path, realPath) → {Router}`](#routerassetspath-realpath--router)
   - [`Router#pre([method], ...middleware) → {Router}`](#routerpremethod-middleware--router)
   - [`Router#middleware() → {GeneratorFunction}`](#routermiddleware--generatorfunction)
 
@@ -232,6 +233,20 @@ router.route('/test', {
 ```javascript
 const testRoute = router.route('/test')
 ```
+
+---
+
+#### `Router#assets(path, realPath) → {Router}`
+
+A convenience method for pointing all subpaths of path to a static assets
+directory and resolving content.
+
+| Name | Type | Attributes | Description |
+| ---- | ---- | ---------- | ----------- |
+| path | `String` |  | The URL prefix for path to assets. |
+| realPath | `String` |  | The path to assets on local file system. |
+
+**Returns:** `Router` Returns this instance of Router.
 
 ---
 

@@ -54,6 +54,14 @@ describe("Router", function() {
     }
   })
 
+  it("handles assets helper method", function* () {
+    const router = new Router()
+
+    router.assets("/static", __dirname)
+
+    expect(router.routes["/static/:assetPath(.+)"].middleware.get).to.exist
+  })
+
   describe("in an app", function() {
     const app = koa()
 
@@ -62,6 +70,7 @@ describe("Router", function() {
     const router3 = new Router({ prefix: "/prefix" })
 
     router
+      .assets("/static", __dirname)
       .route("/test", {
         * get(ctx) {
           ctx.body = "get!"
@@ -113,6 +122,18 @@ describe("Router", function() {
     app.use(router3.middleware())
 
     const request = supertest.agent(app.listen())
+
+    it("returns a static file from /static", function* () {
+      yield request
+        .get("/static/unit.js")
+        .expect(200)
+    })
+
+    it("returns no static file from /static", function* () {
+      yield request
+        .get("/static/nothing")
+        .expect(404)
+    })
 
     it("returns a body from GET", function* () {
       yield request
